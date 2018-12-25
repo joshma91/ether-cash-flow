@@ -12,40 +12,25 @@ import {
   Radio
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
-import getWeb3 from "./utils/getWeb3";
+import * as utils from "./utils"
+import web3 from './web3';
 import FixedMenu from "./components/FixedMenu";
-
 import "./App.css";
 
 class App extends Component {
   state = {
-    storageValue: 0,
-    web3: null,
     accounts: null,
     contract: null,
     radio: "range",
     start: "",
     end: "",
-    diff: ""
+    diff: "",
+    res: null
   };
   handleRadioChange = (e, { value }) => this.setState({ radio: value });
-  handleChangeStart = e => this.setState ({ start: e.target.value })
-  handleChangeEnd = e => this.setState ({ end: e.target.value })
-  handleChangeDiff = e => this.setState ({ diff: e.target.value })
-
-  componentDidMount = async () => {
-    try {
-      // Get network provider and web3 instance.
-      const web3 = await getWeb3();
-      console.log(web3);
-
-      this.setState({ web3 });
-    } catch (error) {
-      // Catch any errors for any of the above operations.
-      alert(`Failed to load web3`);
-      console.error(error);
-    }
-  };
+  handleChangeStart = e => this.setState({ start: e.target.value });
+  handleChangeEnd = e => this.setState({ end: e.target.value });
+  handleChangeDiff = e => this.setState({ diff: e.target.value });
 
   renderForm = () => {
     const { radio, start, end, diff } = this.state;
@@ -83,12 +68,17 @@ class App extends Component {
   };
 
   getDataDiff = async () => {
+    const { diff } = this.state;
 
-  }
+    const currentBlock = await web3.eth.getBlockNumber();
+    const startBlock = currentBlock - diff;
+    const res = await utils.getBlockData(startBlock, currentBlock);
+    this.setState({
+      res
+    });
+  };
 
-  getDataRange = async () => {
-    
-  }
+  getDataRange = async () => {};
 
   render() {
     const { radio, start, end, diff } = this.state;
@@ -103,9 +93,6 @@ class App extends Component {
       }
     ];
 
-    if (!this.state.web3) {
-      return <div>Loading Web3...</div>;
-    }
     return (
       <div className="App">
         <FixedMenu />
