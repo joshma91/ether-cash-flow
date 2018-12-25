@@ -23,12 +23,15 @@ class App extends Component {
     web3: null,
     accounts: null,
     contract: null,
-    radio: null,
+    radio: "range",
     start: "",
     end: "",
     diff: ""
   };
   handleRadioChange = (e, { value }) => this.setState({ radio: value });
+  handleChangeStart = e => this.setState ({ start: e.target.value })
+  handleChangeEnd = e => this.setState ({ end: e.target.value })
+  handleChangeDiff = e => this.setState ({ diff: e.target.value })
 
   componentDidMount = async () => {
     try {
@@ -51,16 +54,17 @@ class App extends Component {
         <div>
           <Input
             type="number"
-            placeholder="Start"
+            placeholder="Start block"
             value={start}
-            onChange={this.handleChangeInputStart}
+            onChange={this.handleChangeStart}
           />
           <Input
             type="number"
-            placeholder="End"
+            placeholder="End block"
             value={end}
-            onChange={this.handleChangeInputEnd}
+            onChange={this.handleChangeEnd}
           />
+          <Button onClick={this.getDataRange}>Query the Blockchain!</Button>
         </div>
       );
     } else if (radio === "latest") {
@@ -70,12 +74,21 @@ class App extends Component {
             type="number"
             placeholder="# of blocks before"
             value={diff}
-            onChange={this.handleChangeInputDiff}
+            onChange={this.handleChangeDiff}
           />
+          <Button onClick={this.getDataDiff}>Query the Blockchain!</Button>
         </div>
       );
     }
   };
+
+  getDataDiff = async () => {
+
+  }
+
+  getDataRange = async () => {
+    
+  }
 
   render() {
     const { radio, start, end, diff } = this.state;
@@ -121,8 +134,9 @@ class App extends Component {
                   onChange={this.handleRadioChange}
                 />
               </Form.Field>
+
+              {this.renderForm()}
             </Form>
-            {this.renderForm()}
           </Segment>
           <Divider section />
 

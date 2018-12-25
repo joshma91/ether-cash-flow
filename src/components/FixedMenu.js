@@ -10,7 +10,7 @@ import {
 } from "semantic-ui-react";
 
 export const FixedMenu = () => (
-  <Menu style={{ height: "90px" }} fixed="top" inverted>
+  <Menu style={{ height: "70px" }} fixed="top" inverted>
     <Container>
       <Menu.Item as="h2" header>
         Ether Cash Flow Tool
