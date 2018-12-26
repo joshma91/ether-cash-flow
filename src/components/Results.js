@@ -21,9 +21,9 @@ export default class Results extends React.Component {
 
           <Table.Body>
             {addresses.length > 0 ? (
-              addresses.map(addr => {
+              addresses.map((addr, i) => {
                 return (
-                  <Table.Row>
+                  <Table.Row key={i}>
                     <Table.Cell>{addr}</Table.Cell>
                     <Table.Cell>
                       {formatNumber(web3.utils.fromWei(totals[addr]))}

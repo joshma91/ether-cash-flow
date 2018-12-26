@@ -87,7 +87,7 @@ class App extends Component {
     const { radio, start, end, diff, res } = this.state;
     const panes = [
       {
-        menuItem: "ETH received by address",
+        menuItem: "ETH Received by Address",
         render: () => (
           <Tab.Pane attached={true}>
             {res ? (<Results
@@ -99,7 +99,7 @@ class App extends Component {
         )
       },
       {
-        menuItem: "ETH sent by address",
+        menuItem: "ETH Sent by Address",
         render: () => (
           <Tab.Pane attached={true}>
             {res ? (<Results
@@ -117,7 +117,7 @@ class App extends Component {
 
         <Container text style={{ marginTop: "7em" }}>
           <Header as="h4" attached="top" block>
-            User Input
+            1. Query the Blockchain
           </Header>
           <Segment attached>
             <Form>
@@ -146,7 +146,7 @@ class App extends Component {
           <Divider section />
 
           <Header as="h4" attached="top" block>
-            Information
+            2. Blockchain Information
           </Header>
           <Segment attached>
             <Grid columns={2} divided>
@@ -160,7 +160,7 @@ class App extends Component {
               </Grid.Row>
             </Grid>
           </Segment>
-          <Divider section />
+          <Divider section={false} hidden />
 
           <Tab menu={{ attached: true }} panes={panes} />
         </Container>
