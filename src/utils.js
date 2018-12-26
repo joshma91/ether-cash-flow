@@ -18,17 +18,20 @@ export const getBlockData = async (start, end) => {
     }, new BigNumber(0))
     .toString();
 
-  const receiverAddrs = getTotalsAndIfContract("to", transactions);
-  const senderAddrs = getTotalsAndIfContract("from", transactions);
+  const receiverAddrs = await getTotals("to", transactions);
+  const senderAddrs = await getTotals("from", transactions);
+
+  const addressesIsContract = await getAddressesIsContract(transactions);
 
   console.log("transactions", transactions);
   console.log("wei transferred", totalWeiTransferred);
   console.log("receivers", receiverAddrs);
   console.log("senders", senderAddrs);
+  console.log("contract addresses", addressesIsContract);
 };
 
-const getTotalsAndIfContract = async (type, transactions) => {
-  const addressTotals = transactions.reduce((acc, tx) => {
+const getTotals = async (type, transactions) => {
+  return transactions.reduce((acc, tx) => {
     const address = tx[type];
     const prevTotal = acc[address] ? acc[address].total : null;
     const newTotal = prevTotal
@@ -38,19 +41,6 @@ const getTotalsAndIfContract = async (type, transactions) => {
     const newObj = { ...acc, [address]: { total: newTotal.toString() } };
     return newObj;
   }, {});
-  console.log(addressTotals)
-
-  // the above code will produce an object having unique address keys
-  // an array of these addresses is used to determine whether it's a contract or not
-  const uniqueAddresses = Object.keys(addressTotals);
-
-  const codePromises = uniqueAddresses
-    .filter(addr => addr !== "null")
-    .map(addr => web3.eth.getCode(addr));
-
-  const addressCodes = await Promise.all(codePromises)
-  console.log(addressCodes)
-  const addressTotalsIsContract = uniqueAddresses;
 };
 
 const getBlocks = async blockNums => {
@@ -58,4 +48,41 @@ const getBlocks = async blockNums => {
     web3.eth.getBlock(blockNum, true)
   );
   return Promise.all(blocksPromises);
+};
+
+const getAddressesIsContract = async transactions => {
+  const uniqueAddresses = getUniqueAddresses(transactions);
+  const addressCodes = await getAddressCodes(uniqueAddresses);
+
+  // contracts will return their bytecode, accounts will return 0x or 0x0
+  const isContractArray = addressCodes.map(code =>
+    code === "0x" || code === "0x0" ? false : true
+  );
+
+  // zip uniqueAddresses with isContractArray
+  const addressesIsContract = uniqueAddresses.reduce((acc, addr, i) => {
+    return { ...acc, [addr]: isContractArray[i] };
+  }, {});
+
+  return addressesIsContract;
+};
+
+const getUniqueAddresses = transactions => {
+  const uniqueAddressesObj = transactions.reduce((acc, tx) => {
+    // omit null addresses from contract creation transactions
+    return Object.assign(
+      acc,
+      tx.from ? { [tx.from]: null } : null,
+      tx.to ? { [tx.to]: null } : null
+    );
+  }, {});
+  return Object.keys(uniqueAddressesObj);
+};
+
+const getAddressCodes = async addresses => {
+  const addressCodePromises = addresses
+    .filter(addr => addr !== "null")
+    .map(addr => web3.eth.getCode(addr));
+
+  return await Promise.all(addressCodePromises);
 };
