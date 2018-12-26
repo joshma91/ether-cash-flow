@@ -11,7 +11,7 @@ export default class SummaryInfo extends React.Component {
 
       <Grid columns={2} divided>
         <Grid.Row>
-          <Grid.Column>Total Eth Transferred: {formatNumber(web3.utils.fromWei(totalWeiTransferred))} </Grid.Column>
+          <Grid.Column>Total ETH Transferred: {formatNumber(web3.utils.fromWei(totalWeiTransferred))} </Grid.Column>
           <Grid.Column>Trust Paid: ETH</Grid.Column>
         </Grid.Row>
         <Grid.Row>

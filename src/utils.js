@@ -44,7 +44,8 @@ export const formatNumber = (numStr) => {
 const getTotals = async (type, transactions) => {
   return transactions.reduce((acc, tx) => {
     const address = tx[type];
-    const prevTotal = acc[address] ? acc[address].total : null;
+    console.log(address)
+    const prevTotal = acc[address] ? acc[address] : null;
     const newTotal = prevTotal
       ? new BigNumber(prevTotal).plus(new BigNumber(tx.value))
       : new BigNumber(tx.value);

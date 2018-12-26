@@ -1,13 +1,12 @@
 import React from "react";
 import { Table, Loader } from "semantic-ui-react";
 import web3 from "../web3";
-import { formatNumber } from "../utils"
+import { formatNumber } from "../utils";
 
 export default class Results extends React.Component {
   render() {
-
     const { totals, addressesIsContract } = this.props;
-    const addresses = Object.keys(totals).filter(addr => addr !== 'null')
+    const addresses = Object.keys(totals).filter(addr => totals[addr] > 0);
     return (
       <div>
         {" "}
@@ -25,7 +24,9 @@ export default class Results extends React.Component {
               addresses.map((addr, i) => {
                 return (
                   <Table.Row key={i}>
-                    <Table.Cell>{addr}</Table.Cell>
+                    <Table.Cell>
+                      {addr === "null" ? "Contract Creation" : addr}
+                    </Table.Cell>
                     <Table.Cell>
                       {formatNumber(web3.utils.fromWei(totals[addr]))}
                     </Table.Cell>
