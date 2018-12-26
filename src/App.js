@@ -27,7 +27,8 @@ class App extends Component {
     start: "",
     end: "",
     diff: "",
-    res: null
+    res: null,
+    loading: false
   };
   handleRadioChange = (e, { value }) => this.setState({ radio: value });
   handleChangeStart = e => this.setState({ start: e.target.value });
@@ -35,7 +36,7 @@ class App extends Component {
   handleChangeDiff = e => this.setState({ diff: e.target.value });
 
   renderForm = () => {
-    const { radio, start, end, diff } = this.state;
+    const { radio, start, end, diff, loading } = this.state;
     if (radio === "range") {
       return (
         <div>
@@ -51,7 +52,9 @@ class App extends Component {
             value={end}
             onChange={this.handleChangeEnd}
           />
-          <Button onClick={this.getDataRange}>Query the Blockchain!</Button>
+          <Button loading={loading} onClick={this.getDataRange}>
+            Query the Blockchain!
+          </Button>
         </div>
       );
     } else if (radio === "latest") {
@@ -63,29 +66,35 @@ class App extends Component {
             value={diff}
             onChange={this.handleChangeDiff}
           />
-          <Button onClick={this.getDataDiff}>Query the Blockchain!</Button>
+          <Button loading={loading} onClick={this.getDataDiff}>
+            Query the Blockchain!
+          </Button>
         </div>
       );
     }
   };
 
   getDataDiff = async () => {
-    const { diff } = this.state;
+    this.setState({ loading: true }, async () => {
+      const { diff } = this.state;
 
-    const currentBlock = await web3.eth.getBlockNumber();
-    const startBlock = currentBlock - parseInt(diff);
-    const res = await getBlockData(startBlock, currentBlock);
-    this.setState({ res });
+      const currentBlock = await web3.eth.getBlockNumber();
+      const startBlock = currentBlock - parseInt(diff);
+      const res = await getBlockData(startBlock, currentBlock);
+      this.setState({ res, loading: false });
+    });
   };
 
   getDataRange = async () => {
-    const { start, end } = this.state;
-    const res = await getBlockData(parseInt(start), parseInt(end));
-    this.setState({ res });
+    this.setState({ loading: true }, async () => {
+      const { start, end } = this.state;
+      const res = await getBlockData(parseInt(start), parseInt(end));
+      this.setState({ res, loading: false });
+    });
   };
 
   render() {
-    const { radio, start, end, diff, res } = this.state;
+    const { radio, start, end, diff, res} = this.state;
     const panes = [
       {
         menuItem: "ETH Received by Address",

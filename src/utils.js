@@ -23,11 +23,6 @@ export const getBlockData = async (start, end) => {
 
   const addressesIsContract = await getAddressesIsContract(transactions);
 
-  console.log("wei transferred", totalWeiTransferred);
-  console.log("receivers", receiverTotals);
-  console.log("senders", senderTotals);
-  console.log("contract addresses", addressesIsContract);
-  
   return {
     totalWeiTransferred,
     receiverTotals,
@@ -38,13 +33,12 @@ export const getBlockData = async (start, end) => {
 };
 
 export const formatNumber = (numStr) => {
-  return parseFloat(numStr).toFixed(4);
+  return parseFloat(numStr).toFixed(5);
 }
 
 const getTotals = async (type, transactions) => {
   return transactions.reduce((acc, tx) => {
     const address = tx[type];
-    console.log(address)
     const prevTotal = acc[address] ? acc[address] : null;
     const newTotal = prevTotal
       ? new BigNumber(prevTotal).plus(new BigNumber(tx.value))

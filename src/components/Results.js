@@ -37,7 +37,7 @@ export default class Results extends React.Component {
                 );
               })
             ) : (
-              <Loader style={{ marginTop: "50px" }} active />
+              null
             )}
           </Table.Body>
         </Table>
