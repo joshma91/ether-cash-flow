@@ -1,6 +1,7 @@
 import React from "react";
 import { Table, Loader } from "semantic-ui-react";
 import web3 from "../web3";
+import { formatNumber } from "../utils"
 
 export default class Results extends React.Component {
   render() {
@@ -42,8 +43,4 @@ export default class Results extends React.Component {
       </div>
     );
   }
-}
-
-const formatNumber = (numStr) => {
-  return parseFloat(numStr).toFixed(4);
 }

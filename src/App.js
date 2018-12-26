@@ -16,6 +16,7 @@ import { getBlockData } from "./utils";
 import web3 from "./web3";
 import FixedMenu from "./components/FixedMenu";
 import Results from "./components/Results";
+import SummaryInfo from "./components/SummaryInfo";
 import "./App.css";
 
 class App extends Component {
@@ -90,11 +91,14 @@ class App extends Component {
         menuItem: "ETH Received by Address",
         render: () => (
           <Tab.Pane attached={true}>
-            {res ? (<Results
-              totals={res.receiverTotals}
-              addressesIsContract={res.addressesIsContract}
-            />): `Please run a query!`}
-            
+            {res ? (
+              <Results
+                totals={res.receiverTotals}
+                addressesIsContract={res.addressesIsContract}
+              />
+            ) : (
+              `Please run a query!`
+            )}
           </Tab.Pane>
         )
       },
@@ -102,10 +106,14 @@ class App extends Component {
         menuItem: "ETH Sent by Address",
         render: () => (
           <Tab.Pane attached={true}>
-            {res ? (<Results
-              totals={res.senderTotals}
-              addressesIsContract={res.addressesIsContract}
-            />): `Please run a query!`}
+            {res ? (
+              <Results
+                totals={res.senderTotals}
+                addressesIsContract={res.addressesIsContract}
+              />
+            ) : (
+              `Please run a query!`
+            )}
           </Tab.Pane>
         )
       }
@@ -149,16 +157,11 @@ class App extends Component {
             2. Blockchain Information
           </Header>
           <Segment attached>
-            <Grid columns={2} divided>
-              <Grid.Row>
-                <Grid.Column>Remaining Trust ETH</Grid.Column>
-                <Grid.Column>Trust Paid: ETH</Grid.Column>
-              </Grid.Row>
-              <Grid.Row>
-                <Grid.Column>Percent/Payment: %</Grid.Column>
-                <Grid.Column>Beneficiary:</Grid.Column>
-              </Grid.Row>
-            </Grid>
+            {res ? (
+              <SummaryInfo totalWeiTransferred={res.totalWeiTransferred} />
+            ) : (
+              `Please run a query!`
+            )}
           </Segment>
           <Divider section={false} hidden />
 

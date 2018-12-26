@@ -37,6 +37,10 @@ export const getBlockData = async (start, end) => {
 
 };
 
+export const formatNumber = (numStr) => {
+  return parseFloat(numStr).toFixed(4);
+}
+
 const getTotals = async (type, transactions) => {
   return transactions.reduce((acc, tx) => {
     const address = tx[type];
