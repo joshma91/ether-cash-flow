@@ -12,7 +12,7 @@ import {
   Radio
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
-import * as utils from "./utils"
+import { getBlockData } from "./utils"
 import web3 from './web3';
 import FixedMenu from "./components/FixedMenu";
 import "./App.css";
@@ -71,14 +71,16 @@ class App extends Component {
     const { diff } = this.state;
 
     const currentBlock = await web3.eth.getBlockNumber();
-    const startBlock = currentBlock - diff;
-    const res = await utils.getBlockData(startBlock, currentBlock);
-    this.setState({
-      res
-    });
+    const startBlock = currentBlock - parseInt(diff);
+    const res = await getBlockData(startBlock, currentBlock);
+    this.setState({res});
   };
 
-  getDataRange = async () => {};
+  getDataRange = async () => {
+    const { start, end } = this.state
+    const res = await getBlockData(parseInt(start), parseInt(end));
+    this.setState({res});
+  };
 
   render() {
     const { radio, start, end, diff } = this.state;
