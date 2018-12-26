@@ -18,16 +18,23 @@ export const getBlockData = async (start, end) => {
     }, new BigNumber(0))
     .toString();
 
-  const receiverAddrs = await getTotals("to", transactions);
-  const senderAddrs = await getTotals("from", transactions);
+  const receiverTotals = await getTotals("to", transactions);
+  const senderTotals = await getTotals("from", transactions);
 
   const addressesIsContract = await getAddressesIsContract(transactions);
 
-  console.log("transactions", transactions);
   console.log("wei transferred", totalWeiTransferred);
-  console.log("receivers", receiverAddrs);
-  console.log("senders", senderAddrs);
+  console.log("receivers", receiverTotals);
+  console.log("senders", senderTotals);
   console.log("contract addresses", addressesIsContract);
+  
+  return {
+    totalWeiTransferred,
+    receiverTotals,
+    senderTotals,
+    addressesIsContract    
+  }
+
 };
 
 const getTotals = async (type, transactions) => {
@@ -38,7 +45,7 @@ const getTotals = async (type, transactions) => {
       ? new BigNumber(prevTotal).plus(new BigNumber(tx.value))
       : new BigNumber(tx.value);
 
-    const newObj = { ...acc, [address]: { total: newTotal.toString() } };
+    const newObj = { ...acc, [address]: newTotal.toString() };
     return newObj;
   }, {});
 };

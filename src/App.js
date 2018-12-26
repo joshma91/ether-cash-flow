@@ -12,9 +12,10 @@ import {
   Radio
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
-import { getBlockData } from "./utils"
-import web3 from './web3';
+import { getBlockData } from "./utils";
+import web3 from "./web3";
 import FixedMenu from "./components/FixedMenu";
+import Results from "./components/Results";
 import "./App.css";
 
 class App extends Component {
@@ -73,25 +74,40 @@ class App extends Component {
     const currentBlock = await web3.eth.getBlockNumber();
     const startBlock = currentBlock - parseInt(diff);
     const res = await getBlockData(startBlock, currentBlock);
-    this.setState({res});
+    this.setState({ res });
   };
 
   getDataRange = async () => {
-    const { start, end } = this.state
+    const { start, end } = this.state;
     const res = await getBlockData(parseInt(start), parseInt(end));
-    this.setState({res});
+    this.setState({ res });
   };
 
   render() {
-    const { radio, start, end, diff } = this.state;
+    const { radio, start, end, diff, res } = this.state;
     const panes = [
       {
-        menuItem: "Administer Trust",
-        render: () => <Tab.Pane attached={true}>Yo it's a test</Tab.Pane>
+        menuItem: "ETH received by address",
+        render: () => (
+          <Tab.Pane attached={true}>
+            {res ? (<Results
+              totals={res.receiverTotals}
+              addressesIsContract={res.addressesIsContract}
+            />): `Please run a query!`}
+            
+          </Tab.Pane>
+        )
       },
       {
-        menuItem: "Payment History",
-        render: () => <Tab.Pane attached={true}> Yo it's a test</Tab.Pane>
+        menuItem: "ETH sent by address",
+        render: () => (
+          <Tab.Pane attached={true}>
+            {res ? (<Results
+              totals={res.senderTotals}
+              addressesIsContract={res.addressesIsContract}
+            />): `Please run a query!`}
+          </Tab.Pane>
+        )
       }
     ];
 
