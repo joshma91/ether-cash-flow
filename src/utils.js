@@ -11,12 +11,7 @@ export const getBlockData = async (start, end) => {
 
   const blocks = await getBlocks(blockNums);
   const transactions = blocks.map(block => block.transactions).flat();
-  const totalWeiTransferred = transactions
-    .reduce((acc, tx) => {
-      const currBN = new BigNumber(tx.value);
-      return acc.plus(currBN);
-    }, new BigNumber(0))
-    .toString();
+  const totalWeiTransferred = getTotalWeiTransferred(transactions)
 
   const receiverTotals = await getTotals("to", transactions);
   const senderTotals = await getTotals("from", transactions);
@@ -34,6 +29,15 @@ export const getBlockData = async (start, end) => {
 
 export const formatNumber = (numStr) => {
   return parseFloat(numStr).toFixed(5);
+}
+
+const getTotalWeiTransferred = transactions => {
+  return transactions
+    .reduce((acc, tx) => {
+      const currBN = new BigNumber(tx.value);
+      return acc.plus(currBN);
+    }, new BigNumber(0))
+    .toString();
 }
 
 const getTotals = async (type, transactions) => {
