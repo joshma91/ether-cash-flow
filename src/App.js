@@ -1,19 +1,10 @@
 import React, { Component } from "react";
 import {
-  Container,
-  Header,
-  Divider,
-  Segment,
-  Button,
-  Grid,
-  Form,
-  Input,
-  Tab,
-  Radio
+  Container, Header, Divider, Segment, Button, Grid, Form, Input, Tab, Radio
 } from "semantic-ui-react";
 import "semantic-ui-css/semantic.min.css";
 import { getBlockData } from "./utils";
-import web3 from "./web3";
+import web3 from "./getWeb3";
 import FixedMenu from "./components/FixedMenu";
 import Results from "./components/Results";
 import SummaryInfo from "./components/SummaryInfo";

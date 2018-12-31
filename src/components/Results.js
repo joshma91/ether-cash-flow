@@ -1,6 +1,6 @@
 import React from "react";
 import { Table, Loader } from "semantic-ui-react";
-import web3 from "../web3";
+import web3 from "../getWeb3";
 import { formatNumber } from "../utils";
 
 export default class Results extends React.Component {
