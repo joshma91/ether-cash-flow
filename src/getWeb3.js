@@ -2,7 +2,7 @@ import Web3 from "web3";
 
 let web3;
 // Modern dapp browsers...
-if (window.ethereum) {
+if (typeof window !== "undefined" && window.ethereum) {
   web3 = new Web3(window.ethereum);
   try {
     // Request account access if needed
@@ -13,7 +13,7 @@ if (window.ethereum) {
   }
 }
 // Legacy dapp browsers...
-else if (window.web3) {
+else if (typeof window !== "undefined" && window.web3) {
   // Use Mist/MetaMask's provider.
   web3 = window.web3;
   console.log("Injected web3 detected.");

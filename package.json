@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "array.prototype.flat": "^1.2.1",
     "bignumber.js": "^8.0.1",
     "ganache-core": "^2.3.3",
     "react": "^16.6.3",

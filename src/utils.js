@@ -1,5 +1,6 @@
 import web3 from "./getWeb3";
 import BigNumber from "bignumber.js";
+import flat from "array.prototype.flat";
 
 export const getBlockData = async (start, end) => {
   console.log(start);
@@ -9,9 +10,8 @@ export const getBlockData = async (start, end) => {
     (_, i) => start + i
   );
 
-  const blocks = await getBlocks(blockNums);
-  const transactions = blocks.map(block => block.transactions).flat();
-  const totalWeiTransferred = getTotalWeiTransferred(transactions)
+  const transactions = await getTransactions(blockNums);
+  const totalWeiTransferred = getTotalWeiTransferred(transactions);
 
   const receiverTotals = await getTotals("to", transactions);
   const senderTotals = await getTotals("from", transactions);
@@ -22,25 +22,30 @@ export const getBlockData = async (start, end) => {
     totalWeiTransferred,
     receiverTotals,
     senderTotals,
-    addressesIsContract    
-  }
-
+    addressesIsContract
+  };
 };
 
-export const formatNumber = (numStr) => {
+export const formatNumber = numStr => {
   return parseFloat(numStr).toFixed(5);
-}
+};
 
-const getTotalWeiTransferred = transactions => {
+export const getTransactions = async (blockNums, web3 = web3) => {
+  const blocks = await getBlocks(blockNums, web3);
+  const transactions = blocks.map(block => block.transactions);
+  return flat(transactions);
+};
+
+export const getTotalWeiTransferred = transactions => {
   return transactions
     .reduce((acc, tx) => {
       const currBN = new BigNumber(tx.value);
       return acc.plus(currBN);
     }, new BigNumber(0))
     .toString();
-}
+};
 
-const getTotals = async (type, transactions) => {
+export const getTotals = async (type, transactions) => {
   return transactions.reduce((acc, tx) => {
     const address = tx[type];
     const prevTotal = acc[address] ? acc[address] : null;
@@ -53,7 +58,7 @@ const getTotals = async (type, transactions) => {
   }, {});
 };
 
-const getBlocks = async blockNums => {
+const getBlocks = async (blockNums, web3 = web3) => {
   const blocksPromises = blockNums.map(blockNum =>
     web3.eth.getBlock(blockNum, true)
   );
