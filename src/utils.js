@@ -10,19 +10,36 @@ export const getBlockData = async (start, end) => {
     (_, i) => start + i
   );
 
-  const transactions = await getTransactions(blockNums);
+  const blocks = await getBlocks(blockNums, web3);
+  const transactions = await getTransactions(blocks, web3);
   const totalWeiTransferred = getTotalWeiTransferred(transactions);
 
   const receiverTotals = await getTotals("to", transactions);
   const senderTotals = await getTotals("from", transactions);
 
   const addressesIsContract = await getAddressesIsContract(transactions);
+  const pctContract = await getPctContract(transactions, addressesIsContract);
+  const numUncles = await getNumUncles(blocks);
+  const numReceivers = await getNumAddresses(receiverTotals);
+  const numSenders = await getNumAddresses(senderTotals);
+
+  const numContract = await getNumContracts(transactions);
+  const numEvents = await getNumEvents(transactions);
+
+  console.log("blocks", blocks);
+  console.log("transactions", transactions);
+  console.log("total transferred", totalWeiTransferred);
+  console.log("receiver totals", receiverTotals);
+  console.log("is Contract", addressesIsContract);
+  console.log("percent contract", pctContract);
+  console.log("numUncles", numUncles);
 
   return {
     totalWeiTransferred,
     receiverTotals,
     senderTotals,
-    addressesIsContract
+    addressesIsContract,
+    pctContract
   };
 };
 
@@ -30,8 +47,7 @@ export const formatNumber = numStr => {
   return parseFloat(numStr).toFixed(5);
 };
 
-export const getTransactions = async (blockNums, web3 = web3) => {
-  const blocks = await getBlocks(blockNums, web3);
+export const getTransactions = async (blocks, web3) => {
   const transactions = blocks.map(block => block.transactions);
   return flat(transactions);
 };
@@ -58,7 +74,7 @@ export const getTotals = async (type, transactions) => {
   }, {});
 };
 
-const getBlocks = async (blockNums, web3 = web3) => {
+export const getBlocks = async (blockNums, web3) => {
   const blocksPromises = blockNums.map(blockNum =>
     web3.eth.getBlock(blockNum, true)
   );
@@ -100,4 +116,43 @@ const getAddressCodes = async addresses => {
     .map(addr => web3.eth.getCode(addr));
 
   return await Promise.all(addressCodePromises);
+};
+
+export const getPctContract = (transactions, addressesIsContract) => {
+  const numContractTxs = transactions
+    .map(tx =>
+      addressesIsContract[tx.from] || addressesIsContract[tx.to] ? 1 : 0
+    )
+    .reduce((acc, curr) => acc + curr, 0);
+
+  return (numContractTxs / transactions.length) * 100;
+};
+
+export const getNumUncles = blocks => {
+  return blocks.reduce((acc, curr) => acc + curr.uncles.length, 0);
+};
+
+export const getNumAddresses = addressTotals => {
+  return addressTotals
+    .map(address => (addressTotals[address] ? 1 : 0))
+    .reduce((acc, curr) => acc + curr, 0);
+};
+
+export const getNumContracts = transactions => {
+  return transactions
+    .map((acc, tx) => (tx.to === null ? 1 : 0))
+    .reduce((acc, curr) => acc + curr, 0);
+};
+
+export const getNumEvents = async transactions => {
+  const txReceiptPromises = transactions.map(tx =>
+    web3.eth.getTransactionReceipt(tx.hash)
+  );
+
+  const txReceipts = await Promise.all(txReceiptPromises);
+  const numEvents = txReceipts.reduce(
+    (acc, receipt) => acc + receipt.logs.length,
+    0
+  );
+  return numEvents;
 };

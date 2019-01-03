@@ -2,7 +2,7 @@
  * @jest-environment node
  */
 
-import { getBlockData, getTotalWeiTransferred, getTransactions } from "./utils";
+import { getBlocks, getBlockData, getTotalWeiTransferred, getTransactions } from "./utils";
 import Ganache from "ganache-core";
 import Web3 from "web3";
 import BigNumber from "bignumber.js";
@@ -47,11 +47,11 @@ describe("Testing util functions", async () => {
     });
 
     currentBlock = await web3.eth.getBlockNumber();
-    console.log("current block", currentBlock);
-    console.log("accounts", accounts);
+    const blockNums = Array.from({ length: currentBlock + 1 }, (_, i) => i)
+    const blocks = await getBlocks(blockNums, web3)
 
     transactions = await getTransactions(
-      Array.from({ length: currentBlock + 1 }, (_, i) => i),
+      blocks,
       web3
     );
     console.log("transactions", transactions);
@@ -65,7 +65,7 @@ describe("Testing util functions", async () => {
     );
   });
 
-  test("should show that 1.5 ETH total was transferred", async () => {
+  test("should show that 3.5 ETH total was transferred", async () => {
     const totalWeiTransferred = getTotalWeiTransferred(transactions);
     console.log(totalWeiTransferred);
     expect(totalWeiTransferred).toEqual(web3.utils.toWei("3.5"));
