@@ -17,7 +17,7 @@ export const getBlockData = async (start, end) => {
   const receiverTotals = await getTotals("to", transactions);
   const senderTotals = await getTotals("from", transactions);
 
-  const addressesIsContract = await getAddressesIsContract(transactions);
+  const addressesIsContract = await getAddressesIsContract(transactions, web3);
   const pctContract = await getPctContract(transactions, addressesIsContract);
   const numUncles = await getNumUncles(blocks);
   const numReceivers = await getNumAddresses(receiverTotals);
@@ -81,9 +81,9 @@ export const getBlocks = async (blockNums, web3) => {
   return Promise.all(blocksPromises);
 };
 
-const getAddressesIsContract = async transactions => {
+export const getAddressesIsContract = async (transactions, web3) => {
   const uniqueAddresses = getUniqueAddresses(transactions);
-  const addressCodes = await getAddressCodes(uniqueAddresses);
+  const addressCodes = await getAddressCodes(uniqueAddresses, web3);
 
   // contracts will return their bytecode, accounts will return 0x or 0x0
   const isContractArray = addressCodes.map(code =>
@@ -110,7 +110,7 @@ const getUniqueAddresses = transactions => {
   return Object.keys(uniqueAddressesObj);
 };
 
-const getAddressCodes = async addresses => {
+const getAddressCodes = async (addresses = [], web3) => {
   const addressCodePromises = addresses
     .filter(addr => addr !== "null")
     .map(addr => web3.eth.getCode(addr));
