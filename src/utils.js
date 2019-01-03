@@ -18,13 +18,13 @@ export const getBlockData = async (start, end) => {
   const senderTotals = await getTotals("from", transactions);
 
   const addressesIsContract = await getAddressesIsContract(transactions, web3);
-  const pctContract = await getPctContract(transactions, addressesIsContract);
-  const numUncles = await getNumUncles(blocks);
-  const numReceivers = await getNumAddresses(receiverTotals);
-  const numSenders = await getNumAddresses(senderTotals);
+  const pctContract = getPctContract(transactions, addressesIsContract);
+  const numUncles = getNumUncles(blocks);
+  const numReceivers = getNumAddresses(receiverTotals);
+  const numSenders = getNumAddresses(senderTotals);
 
-  const numContract = await getNumContracts(transactions);
-  const numEvents = await getNumEvents(transactions);
+  const numContracts = getNumContracts(transactions);
+  const numEvents = await getNumEvents(transactions, web3);
 
   console.log("blocks", blocks);
   console.log("transactions", transactions);
@@ -133,18 +133,17 @@ export const getNumUncles = blocks => {
 };
 
 export const getNumAddresses = addressTotals => {
-  return addressTotals
-    .map(address => (addressTotals[address] ? 1 : 0))
-    .reduce((acc, curr) => acc + curr, 0);
+  const addressArray = Object.keys(addressTotals).filter(addr => addr !== "null")
+  return addressArray.length;
 };
 
 export const getNumContracts = transactions => {
   return transactions
-    .map((acc, tx) => (tx.to === null ? 1 : 0))
+    .map(tx => (tx.to === null ? 1 : 0))
     .reduce((acc, curr) => acc + curr, 0);
 };
 
-export const getNumEvents = async transactions => {
+export const getNumEvents = async (transactions, web3) => {
   const txReceiptPromises = transactions.map(tx =>
     web3.eth.getTransactionReceipt(tx.hash)
   );
