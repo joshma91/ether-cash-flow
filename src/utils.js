@@ -3,8 +3,6 @@ import BigNumber from "bignumber.js";
 import flat from "array.prototype.flat";
 
 export const getBlockData = async (start, end) => {
-  console.log(start);
-  console.log(end);
   const blockNums = Array.from(
     { length: end + 1 - start },
     (_, i) => start + i
@@ -26,20 +24,19 @@ export const getBlockData = async (start, end) => {
   const numContracts = getNumContracts(transactions);
   const numEvents = await getNumEvents(transactions, web3);
 
-  console.log("blocks", blocks);
-  console.log("transactions", transactions);
-  console.log("total transferred", totalWeiTransferred);
-  console.log("receiver totals", receiverTotals);
-  console.log("is Contract", addressesIsContract);
-  console.log("percent contract", pctContract);
-  console.log("numUncles", numUncles);
-
   return {
+    start,
+    end,
     totalWeiTransferred,
     receiverTotals,
     senderTotals,
     addressesIsContract,
-    pctContract
+    pctContract,
+    numUncles,
+    numReceivers,
+    numSenders,
+    numContracts,
+    numEvents
   };
 };
 
