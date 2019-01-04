@@ -2,11 +2,6 @@ import React from "react";
 import {
   Container,
   Menu,
-  Modal,
-  Button,
-  Grid,
-  Image,
-  Header
 } from "semantic-ui-react";
 
 export const FixedMenu = () => (
