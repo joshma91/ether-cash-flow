@@ -26,7 +26,7 @@ yarn
 
 ## Running 
 
-1. ensure you have [MetaMask](https://metamask.com) Chrome extension intalled
+1. ensure you have [MetaMask](https://metamask.io) Chrome extension intalled
 
 2. `npm run start` or `yarn start` to serve pages to local dev server 
 
