@@ -1,7 +1,6 @@
 import React from "react";
 import { Table, Loader } from "semantic-ui-react";
 import web3 from "../getWeb3";
-import { formatNumber } from "../utils";
 
 export default class Results extends React.Component {
   render() {
@@ -28,7 +27,7 @@ export default class Results extends React.Component {
                       {addr === "null" ? "Contract Creation" : addr}
                     </Table.Cell>
                     <Table.Cell>
-                      {formatNumber(web3.utils.fromWei(totals[addr]))}
+                      {web3.utils.fromWei(totals[addr])}
                     </Table.Cell>
                     <Table.Cell>
                       {addressesIsContract[addr] ? `YES` : `NO`}
