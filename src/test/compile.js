@@ -1,3 +1,5 @@
+// referenced from: https://hackernoon.com/minimal-solidity-contract-testing-with-ganache-and-jest-f735547d9643
+
 const path = require("path");
 const fs = require("fs");
 const solc = require("solc");
