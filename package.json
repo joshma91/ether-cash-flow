@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@drizzle-utils/core": "^0.1.7-alpha.0",
+    "@drizzle-utils/get-web3": "^0.1.7-alpha.0",
     "array.prototype.flat": "^1.2.1",
     "bignumber.js": "^8.0.1",
     "ganache-core": "^2.3.3",

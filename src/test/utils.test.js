@@ -14,16 +14,16 @@ import {
   getNumAddresses,
   getNumContracts,
   getNumEvents
-
 } from "../utils";
 import Ganache from "ganache-core";
-import Web3 from "web3";
+const getWeb3 = require("@drizzle-utils/get-web3")
+const createDrizzleUtils = require("@drizzle-utils/core")
 import BigNumber from "bignumber.js";
 import compile from "./compile";
 
 describe("Testing util functions", async () => {
-  let accounts;
   let web3;
+  let accounts;
   let blocks;
   let originalAcct1Balance;
   let currentBlock;
@@ -35,19 +35,27 @@ describe("Testing util functions", async () => {
 
   beforeAll(async () => {
     const provider = Ganache.provider();
-    web3 = new Web3(provider);
-    accounts = await web3.eth.getAccounts();
 
+    // initialize the tooling
+    web3 = await getWeb3({customProvider: provider});
+    const drizzleUtils = await createDrizzleUtils({ web3 })
+    accounts = await drizzleUtils.getAccounts()
+    console.log("accounts", accounts)
+    
     // compile contract artifact
     const { SimpleStorage } = await compile("SimpleStorage.sol");
 
-    // create initial contract instance
-    const instance = new web3.eth.Contract(SimpleStorage.abi);
+    // `instance` is a web3 Contract instance of the deployed contract
+    const instance = await drizzleUtils.getContractInstance({
+      artifact: SimpleStorage.abi
+    })
 
     // deploy contract and get new deployed instance
     const deployedInstance = await instance
       .deploy({ data: SimpleStorage.evm.bytecode.object })
       .send({ from: accounts[0], gas: 150000 });
+
+    console.log("deployed Instance",)
 
     // assign deployed contract instance to variable
     contractInstance = deployedInstance;
@@ -87,13 +95,14 @@ describe("Testing util functions", async () => {
     transactions = await getTransactions(blocks, web3);
   });
 
-  afterAll(async () => {
-    // clean up provider
-    provider.stop();
-  });
+  // afterAll(async () => {
+  //   // clean up provider
+  //   provider.stop();
+  // });
 
   test("should show that 0.5 ETH was transferred to accounts[1]", async () => {
     const acct1Balance = new BigNumber(await web3.eth.getBalance(accounts[1]));
+    console.log(acct1Balance)
     expect(acct1Balance.minus(originalAcct1Balance).toString()).toEqual(
       web3.utils.toWei("0.5")
     );
@@ -112,7 +121,7 @@ describe("Testing util functions", async () => {
       [accounts[1]]: web3.utils.toWei("0.5"),
       [accounts[2]]: web3.utils.toWei("3"),
       [contractInstance._address]: "0",
-      null: "0",
+      null: "0"
     };
 
     const expectedSenderTotals = {
@@ -124,44 +133,41 @@ describe("Testing util functions", async () => {
   });
 
   test("should return array of unique addresses and whether or not the address is a contract", async () => {
-    addressesIsContract = await getAddressesIsContract(
-      transactions,
-      web3
-    );
+    addressesIsContract = await getAddressesIsContract(transactions, web3);
     const expectedAddressesIsContract = {
       [accounts[0]]: false,
       [accounts[1]]: false,
       [accounts[2]]: false,
       [contractInstance._address]: true
-    }
-    expect(addressesIsContract).toEqual(expectedAddressesIsContract)
+    };
+    expect(addressesIsContract).toEqual(expectedAddressesIsContract);
   });
 
-  test("should return proper percentage of total transactions being contract transactions", async() => {
-    const pctContract = getPctContract(transactions, addressesIsContract)
-    
-    expect(pctContract).toEqual((1/6)*100)
+  test("should return proper percentage of total transactions being contract transactions", async () => {
+    const pctContract = getPctContract(transactions, addressesIsContract);
+
+    expect(pctContract).toEqual((1 / 6) * 100);
   });
 
   test("should return proper number of uncles", () => {
-    const numUncles = getNumUncles(blocks)
-    expect(numUncles).toEqual(0)
-  })
+    const numUncles = getNumUncles(blocks);
+    expect(numUncles).toEqual(0);
+  });
 
-  test("should return proper number of receiving/sending addresses", () =>{
-    const numReceivers = getNumAddresses(receiverTotals)
-    const numSenders = getNumAddresses(senderTotals)
-    expect(numReceivers).toEqual(3)
-    expect(numSenders).toEqual(1)
-  })
+  test("should return proper number of receiving/sending addresses", () => {
+    const numReceivers = getNumAddresses(receiverTotals);
+    const numSenders = getNumAddresses(senderTotals);
+    expect(numReceivers).toEqual(3);
+    expect(numSenders).toEqual(1);
+  });
 
-  test("should return proper number of created contracts", () =>{
-    const numContracts = getNumContracts(transactions)
-    expect(numContracts).toEqual(1)
-  })
+  test("should return proper number of created contracts", () => {
+    const numContracts = getNumContracts(transactions);
+    expect(numContracts).toEqual(1);
+  });
 
-  test("should return proper number of emitted events", async () =>{
-    const numEvents = await getNumEvents(transactions, web3)
-    expect(numEvents).toEqual(1)
-  })
+  test("should return proper number of emitted events", async () => {
+    const numEvents = await getNumEvents(transactions, web3);
+    expect(numEvents).toEqual(1);
+  });
 });
