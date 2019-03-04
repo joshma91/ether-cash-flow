@@ -18,6 +18,7 @@ import {
 import Ganache from "ganache-core";
 const getWeb3 = require("@drizzle-utils/get-web3")
 const createDrizzleUtils = require("@drizzle-utils/core")
+const getContractInstance = require("@drizzle-utils/get-contract-instance")
 import BigNumber from "bignumber.js";
 import compile from "./compile";
 
@@ -45,9 +46,11 @@ describe("Testing util functions", async () => {
     // compile contract artifact
     const { SimpleStorage } = await compile("SimpleStorage.sol");
 
+    console.log(SimpleStorage)
     // `instance` is a web3 Contract instance of the deployed contract
-    const instance = await drizzleUtils.getContractInstance({
-      artifact: SimpleStorage.abi
+    const instance = await getContractInstance({
+      web3,
+      abi: SimpleStorage.abi
     })
 
     // deploy contract and get new deployed instance
